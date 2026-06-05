@@ -1,0 +1,31 @@
+{
+  "name": "Basi-jarvis",
+  "short_name": "Basi-jarvis",
+  "description": "Your personal 24/7 AI assistant",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Chat",
+      "url": "/dashboard",
+      "description": "Open the chat"
+    },
+    {
+      "name": "Settings",
+      "url": "/dashboard/settings",
+      "description": "Open settings"
+    }
+  ]
+}
