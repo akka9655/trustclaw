@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",
+    "@ai-sdk/openai": "^3.0.68",
     "@ai-sdk/react": "^3.0.87",
     "@composio/core": "^0.6.3",
     "@composio/vercel": "^0.6.3",

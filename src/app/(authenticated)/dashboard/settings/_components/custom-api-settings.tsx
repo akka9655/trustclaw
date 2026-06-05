@@ -16,6 +16,7 @@ import {
 
 const PROVIDER_PRESETS = [
   { label: "OpenAI", url: "https://api.openai.com/v1", model: "gpt-4o" },
+  { label: "GitHub Models", url: "https://models.github.ai/inference", model: "gpt-4o-mini" },
   { label: "Groq", url: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile" },
   { label: "OpenRouter", url: "https://openrouter.ai/api/v1", model: "meta-llama/llama-4-maverick:free" },
   { label: "Together AI", url: "https://api.together.xyz/v1", model: "meta-llama/Llama-3.3-70B-Instruct-Turbo" },

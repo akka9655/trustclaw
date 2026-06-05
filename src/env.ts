@@ -31,6 +31,7 @@ export const env = createEnv({
     // Optional Deployment integrations
     VERCEL_TOKEN: z.string().optional(),
     GITHUB_TOKEN: z.string().optional(),
+    GITHUB_MODELS_API_KEY: z.string().optional(),
 
     // Redis (optional - resumable streams disabled when missing; basic streaming still works)
     REDIS_URL: z.string().optional(),
@@ -67,6 +68,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     VERCEL_TOKEN: process.env.VERCEL_TOKEN,
     GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+    GITHUB_MODELS_API_KEY: process.env.GITHUB_MODELS_API_KEY,
     REDIS_URL: process.env.REDIS_URL,
     RATE_LIMIT_CHAT_PER_MINUTE: process.env.RATE_LIMIT_CHAT_PER_MINUTE,
     RATE_LIMIT_CHAT_PER_DAY: process.env.RATE_LIMIT_CHAT_PER_DAY,

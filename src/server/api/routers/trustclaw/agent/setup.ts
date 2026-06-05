@@ -1,5 +1,6 @@
 import { ToolLoopAgent, stepCountIs } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenAI } from "@ai-sdk/openai";
 import type { ToolSet, SystemModelMessage } from "ai";
 import { db } from "~/server/clients/db";
 import { createComposioClient } from "~/server/clients/composio";
@@ -184,8 +185,41 @@ export async function prepareAgentRun(
     },
   });
 
+  // Resolve model based on custom API, selected built-in GitHub model, or default to Gemini
+  let agentModel: any = geminiModel;
+
+  if (instance.customApiUrl && instance.customApiKey) {
+    const customOpenai = createOpenAI({
+      baseURL: instance.customApiUrl,
+      apiKey: instance.customApiKey,
+    });
+    agentModel = customOpenai(instance.customApiModel || "gpt-4o");
+  } else if (instance.anthropicModel && instance.anthropicModel.startsWith("github-")) {
+    const githubModelsApiKey = process.env.GITHUB_MODELS_API_KEY || process.env.GITHUB_TOKEN;
+    if (!githubModelsApiKey) {
+      throw new Error(
+        "GitHub Models API key is missing. Please add GITHUB_MODELS_API_KEY to your environment variables (e.g. in Vercel) or configure the Custom API Provider section."
+      );
+    }
+    const githubOpenai = createOpenAI({
+      baseURL: "https://models.github.ai/inference",
+      apiKey: githubModelsApiKey,
+    });
+
+    let modelId = "gpt-4o-mini";
+    if (instance.anthropicModel === "github-gpt-4o") {
+      modelId = "gpt-4o";
+    } else if (instance.anthropicModel === "github-llama-3.3-70b-instruct") {
+      modelId = "meta/llama-3.3-70b-instruct";
+    } else if (instance.anthropicModel === "github-cohere-command-r-plus") {
+      modelId = "cohere/Command-R-Plus";
+    }
+    
+    agentModel = githubOpenai(modelId);
+  }
+
   const agent = new ToolLoopAgent({
-    model: geminiModel,
+    model: agentModel,
     instructions: {
       role: "system",
       content: systemPrompt,
