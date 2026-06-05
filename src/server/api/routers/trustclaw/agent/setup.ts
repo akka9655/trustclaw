@@ -195,10 +195,10 @@ export async function prepareAgentRun(
     });
     agentModel = customOpenai(instance.customApiModel || "gpt-4o");
   } else if (instance.anthropicModel && instance.anthropicModel.startsWith("github-")) {
-    const githubModelsApiKey = process.env.GITHUB_MODELS_API_KEY || process.env.GITHUB_TOKEN;
+    const githubModelsApiKey = process.env.GITHUB_MODELS_API_KEY ?? process.env.GITHUB_TOKEN;
     if (!githubModelsApiKey) {
       throw new Error(
-        "GitHub Models API key is missing. Please add GITHUB_MODELS_API_KEY to your environment variables (e.g. in Vercel) or configure the Custom API Provider section."
+        "GitHub Models API key is missing. Add GITHUB_MODELS_API_KEY to Vercel environment variables (GitHub PAT with models:read scope)."
       );
     }
     const githubOpenai = createOpenAI({
@@ -206,17 +206,27 @@ export async function prepareAgentRun(
       apiKey: githubModelsApiKey,
     });
 
-    let modelId = "gpt-4o-mini";
-    if (instance.anthropicModel === "github-gpt-4o") {
-      modelId = "gpt-4o";
-    } else if (instance.anthropicModel === "github-llama-3.3-70b-instruct") {
-      modelId = "meta/llama-3.3-70b-instruct";
-    } else if (instance.anthropicModel === "github-cohere-command-r-plus") {
-      modelId = "cohere/Command-R-Plus";
-    }
-    
-    agentModel = githubOpenai(modelId);
+    // Map our schema key → actual GitHub Models API model ID
+    const GITHUB_MODEL_MAP: Record<string, string> = {
+      "github-gpt-4.1-nano":           "openai/gpt-4.1-nano",
+      "github-gpt-4.1-mini":           "openai/gpt-4.1-mini",
+      "github-gpt-4o-mini":            "openai/gpt-4o-mini",
+      "github-gpt-4o":                 "openai/gpt-4o",
+      "github-o4-mini":                "openai/o4-mini",
+      "github-llama-3.1-8b-instruct":  "meta/meta-llama-3.1-8b-instruct",
+      "github-llama-3.3-70b-instruct": "meta/llama-3.3-70b-instruct",
+      "github-phi-4-mini-instruct":    "microsoft/phi-4-mini-instruct",
+      "github-phi-4":                  "microsoft/phi-4",
+      "github-deepseek-v3":            "deepseek/DeepSeek-V3-0324",
+      "github-deepseek-r1":            "deepseek/DeepSeek-R1",
+      "github-mistral-small":          "mistral-ai/mistral-small-3.1-24b-instruct-2503",
+      "github-grok-3-mini":            "xai/grok-3-mini",
+    };
+
+    const resolvedModelId = GITHUB_MODEL_MAP[instance.anthropicModel] ?? "openai/gpt-4o-mini";
+    agentModel = githubOpenai(resolvedModelId);
   }
+
 
   const agent = new ToolLoopAgent({
     model: agentModel,

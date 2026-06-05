@@ -9,12 +9,20 @@ import { MODELS } from "./onboarding.consts";
 import { StepLayout, itemVariants } from "./step-layout";
 
 const MODEL_ICONS: Record<string, React.ElementType> = {
-  "claude-opus-4-6": Brain,
-  "claude-sonnet-4-6-20251120": Cpu,
-  "claude-sonnet-4-5-20250929": Cpu,
-  "claude-3-7-sonnet-20250219": Brain,
-  "claude-haiku-4-5-20251001": Zap,
-  "claude-3-5-haiku-20241022": Zap,
+  "gemini-2.5-flash":            Zap,
+  "github-gpt-4.1-nano":         Zap,
+  "github-gpt-4.1-mini":         Zap,
+  "github-gpt-4o-mini":          Cpu,
+  "github-gpt-4o":               Cpu,
+  "github-o4-mini":              Brain,
+  "github-llama-3.1-8b-instruct":Zap,
+  "github-llama-3.3-70b-instruct":Cpu,
+  "github-phi-4-mini-instruct":  Zap,
+  "github-phi-4":                Cpu,
+  "github-deepseek-v3":          Cpu,
+  "github-deepseek-r1":          Brain,
+  "github-mistral-small":        Zap,
+  "github-grok-3-mini":          Brain,
 };
 
 interface ModelStepProps {
