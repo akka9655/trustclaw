@@ -1,4 +1,5 @@
 import { smoothStream, UI_MESSAGE_STREAM_HEADERS } from "ai";
+import { clearStreamingMessage } from "~/server/clients/redis";
 import { z } from "zod";
 import { auth } from "~/server/auth";
 import { db } from "~/server/clients/db";
@@ -181,19 +182,24 @@ export async function GET(request: Request) {
 
     const activeStreamId = await getStreamingMessage(instanceId);
     if (activeStreamId !== streamId) {
-      return new Response("Stream not found or not yours", { status: 404 });
+      // Stale stream ID — clear it from Redis so future page loads don't retry
+      await clearStreamingMessage(instanceId).catch(() => null);
+      // Return 200 with empty body — NOT 404. The SDK treats 404 as a fatal
+      // error and fires onError. An empty 200 signals "nothing to resume" cleanly.
+      return new Response(null, { status: 200 });
     }
 
     const streamContext = getStreamContext();
     if (!streamContext) {
-      // 404 instead of 204 — 204 No Content causes a Response constructor crash in Next.js
-      return new Response("Stream resumption not available", { status: 404 });
+      // Redis/stream context unavailable — not an error, just no resumption
+      return new Response(null, { status: 200 });
     }
 
     const stream = await streamContext.resumeExistingStream(streamId);
     if (!stream) {
-      // 404 instead of 204 — 204 No Content causes a Response constructor crash in Next.js
-      return new Response("Stream already completed", { status: 404 });
+      // Stream already completed — clear stale Redis key and signal gracefully
+      await clearStreamingMessage(instanceId).catch(() => null);
+      return new Response(null, { status: 200 });
     }
 
     return new Response(stream.pipeThrough(new TextEncoderStream()), {

@@ -34,9 +34,19 @@ export function useChatHook({ initialMessages, streamId }: {
     onError: (error) => {
       void utils.trustclaw.getHistory.invalidate();
 
-      // Try to parse the error body for a user-friendly message
-      let message = "Something went wrong. Please try again.";
       const rawMessage = error instanceof Error ? error.message : String(error);
+
+      // Silently ignore expected stream-reconnect non-errors — these happen
+      // normally when the page loads with a stale/completed streamId in Redis.
+      const isStreamNonError =
+        rawMessage.includes("Stream not found") ||
+        rawMessage.includes("Stream already completed") ||
+        rawMessage.includes("Stream resumption not available") ||
+        rawMessage.includes("nothing to resume");
+      if (isStreamNonError) return;
+
+      // Show user-friendly toast for real errors
+      let message = "Something went wrong. Please try again.";
 
       if (rawMessage.includes("quota") || rawMessage.includes("rate_limit") || rawMessage.includes("429")) {
         message = "⚠️ AI quota exceeded — switch to a GitHub Model in Settings, or wait and retry.";
