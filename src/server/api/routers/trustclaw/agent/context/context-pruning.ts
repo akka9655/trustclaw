@@ -3,13 +3,13 @@
 import type { ReconstructedMessage } from "../types";
 import { sanitizeString } from "./build-context";
 
-const SOFT_TRIM_RATIO = 0.3;
-const HARD_CLEAR_RATIO = 0.5;
+const SOFT_TRIM_RATIO = 0.2;
+const HARD_CLEAR_RATIO = 0.4;
 const KEEP_LAST_ASSISTANTS = 3;
-const SOFT_TRIM_MAX_CHARS = 4_000;
-const SOFT_TRIM_HEAD_CHARS = 1_500;
-const SOFT_TRIM_TAIL_CHARS = 1_500;
-const MIN_PRUNABLE_TOOL_CHARS = 50_000;
+const SOFT_TRIM_MAX_CHARS = 1_500;
+const SOFT_TRIM_HEAD_CHARS = 600;
+const SOFT_TRIM_TAIL_CHARS = 600;
+const MIN_PRUNABLE_TOOL_CHARS = 4_000;
 const HARD_CLEAR_PLACEHOLDER = "[Old tool result content cleared]";
 const CHARS_PER_TOKEN_ESTIMATE = 4;
 

@@ -15,7 +15,7 @@ import { runCompaction } from "../compaction/run-compaction";
 import { runMemoryFlush } from "../compaction/memory-flush";
 import { COMPACTION_SUMMARY_PREFIX } from "../compaction/prompts";
 
-const MESSAGE_SAFETY_CAP = 200;
+const MESSAGE_SAFETY_CAP = 40;
 
 // Lone surrogates in strings produce invalid JSON when serialized for the Anthropic API.
 // This can happen when external tool results (e.g. from Composio) contain malformed Unicode.

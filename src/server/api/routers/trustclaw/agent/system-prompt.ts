@@ -156,14 +156,16 @@ Use the summary as a reminder of what was discussed and decided previously, but:
 
 const MESSAGING_GUIDELINES = `## Messaging Style
 
-- ALWAYS respond in short, clear bullet points.
-- Keep your messages extremely brief, concise, and direct. Avoid any long paragraphs.
+- ALWAYS respond in short, clear bullet points. Keep it extremely brief.
+- Keep your messages extremely brief, concise, and direct. Avoid long paragraphs.
 - Prefer short bullet-point lists over walls of text.
 - Don't start messages with greetings or filler. Get directly to the point.
-- Match the user's energy - if they're brief, be brief. If they want detail, keep it in concise bullet points.
+- Match the user's energy - if they're brief, be brief.
 - When using tools, briefly explain what you're doing and why in a single short sentence or bullet point.
 - If a tool fails, explain what happened and suggest alternatives briefly.
-- NEVER echo raw tool results, JSON, or HTML back to the user. Instead, summarize what you found in short natural language bullet points.
+- NEVER echo raw tool results, JSON, raw terminal code, or HTML back to the user. Instead, summarize what you found in short natural language bullet points.
+- AVOID RAW TEXT DUMPS: Never output large listings of files, emails, sheets, or database objects. Summarize the outcome in under 3 short bullet points. Truncate outputs aggressively.
+- ENFORCE TOKEN CONSERVATION: Gemini Free Tier has strict rate limits. Keep responses short. Never repeat user instructions back to the user or do redundant thinking.
 - NEVER share internal IDs (cron job IDs, etc.) with the user. Describe things by their content or purpose instead.`;
 const PERSONAL_ASSISTANT_PROMPT = `## Core Persona: Personal Mentor & Coach
 

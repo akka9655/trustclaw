@@ -33,6 +33,37 @@ const geminiModel = google("gemini-2.5-flash");
 
 type MessageSource = "web" | "telegram" | "cron";
 
+function truncateLargeToolOutput(value: unknown): unknown {
+  if (typeof value === "string") {
+    if (value.length > 2000) {
+      return (
+        value.slice(0, 1000) +
+        "\n...[Output truncated to conserve tokens]...\n" +
+        value.slice(-1000)
+      );
+    }
+    return value;
+  }
+  if (Array.isArray(value)) {
+    if (value.length > 15) {
+      const truncatedArray = value.slice(0, 15).map(truncateLargeToolOutput);
+      truncatedArray.push(
+        `...[${value.length - 15} items truncated to conserve tokens]...`,
+      );
+      return truncatedArray;
+    }
+    return value.map(truncateLargeToolOutput);
+  }
+  if (value !== null && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = truncateLargeToolOutput(v);
+    }
+    return out;
+  }
+  return value;
+}
+
 function sanitizeToolResults(tools: ToolSet): ToolSet {
   const wrapped: ToolSet = {};
   for (const [name, tool] of Object.entries(tools)) {
@@ -44,7 +75,7 @@ function sanitizeToolResults(tools: ToolSet): ToolSet {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const result = await originalExecute(...args);
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          return deepSanitize(result);
+          return deepSanitize(truncateLargeToolOutput(result));
         },
       };
     } else {
