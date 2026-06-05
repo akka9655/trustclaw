@@ -182,8 +182,8 @@ export function ChatInput({ onSend, onStop, status }: ChatInputProps) {
   };
 
   return (
-    <div className="border-border bg-background/95 border-t backdrop-blur-sm">
-      <div className="mx-auto max-w-2xl p-2 pb-safe sm:p-3 md:p-4 space-y-2">
+    <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm">
+      <div className="mx-auto max-w-2xl space-y-2 p-2 pb-safe sm:p-3 md:p-4">
         {/* Quick Actions Scroll Bar */}
         <div className="flex gap-2 overflow-x-auto pb-2 pt-1 scrollbar-none snap-x mask-gradient-right">
           {QUICK_ACTIONS.map((act) => (
