@@ -98,7 +98,8 @@ export function ToolkitsClient() {
   const isSearching = isFetching && !isFetchingNextPage && !isLoading;
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-6 p-4 md:p-6">
+    <div className="h-full overflow-y-auto">
+    <div className="mx-auto w-full max-w-5xl space-y-4 px-3 py-4 sm:space-y-6 sm:px-4 md:px-6 md:py-6">
       <h1 className="text-foreground text-xl font-bold md:text-2xl">
         Toolkits
       </h1>
@@ -139,7 +140,7 @@ export function ToolkitsClient() {
           </div>
         ) : (
           <div
-            className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+            className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4"
             onPointerMove={handlePointerMove}
           >
             {allItems.map((toolkit) => (
@@ -157,6 +158,7 @@ export function ToolkitsClient() {
           <span className="text-muted-foreground text-sm">Loading more...</span>
         </div>
       )}
+    </div>
     </div>
   );
 }

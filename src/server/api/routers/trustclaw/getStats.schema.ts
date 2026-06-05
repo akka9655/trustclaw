@@ -4,6 +4,9 @@ export const getStatsOutput = z.object({
   totalMessages: z.number(),
   totalInputTokens: z.number(),
   totalOutputTokens: z.number(),
+  todayMessages: z.number(),
+  todayInputTokens: z.number(),
+  todayOutputTokens: z.number(),
   dailyMessages: z.array(
     z.object({
       date: z.string(),

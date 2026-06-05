@@ -51,7 +51,8 @@ export function SettingsPageClient() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 p-4 pb-8 md:space-y-6 md:p-6">
+    <div className="h-full overflow-y-auto">
+    <div className="mx-auto w-full max-w-2xl space-y-4 px-3 py-4 pb-8 sm:px-4 md:space-y-6 md:px-6 md:py-6">
       <div className="flex items-center gap-2 pb-1">
         <Settings className="text-muted-foreground h-5 w-5" />
         <div>
@@ -101,6 +102,7 @@ export function SettingsPageClient() {
       <ErrorBoundary>
         <DangerZone />
       </ErrorBoundary>
+    </div>
     </div>
   );
 }

@@ -8,6 +8,8 @@ import { Textarea } from "~/components/ui/textarea";
 import { cn } from "~/lib/utils";
 import { showSuccessToast } from "~/components/core/toast-notifications";
 
+import { useSearchParams } from "next/navigation";
+
 interface ChatInputProps {
   onSend: (message: string) => void;
   onStop: () => void;
@@ -33,6 +35,19 @@ export function ChatInput({ onSend, onStop, status }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<{ start: () => void; stop: () => void } | null>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const prompt = searchParams.get("prompt");
+    if (prompt) {
+      setInput(prompt);
+      // Clean up the URL parameter
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete("prompt");
+      const cleanPath = `${window.location.pathname}${newParams.toString() ? `?${newParams.toString()}` : ""}`;
+      window.history.replaceState(null, "", cleanPath);
+    }
+  }, [searchParams]);
 
   const isStreaming = status === "streaming" || status === "submitted";
   const isTooLong = input.length > MAX_MESSAGE_LENGTH;

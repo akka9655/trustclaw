@@ -20,13 +20,25 @@ export const getStats = protectedProcedure.query(async ({ ctx }) => {
     };
   }
 
+  const todayStart = new Date();
+  todayStart.setUTCHours(0, 0, 0, 0);
+
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  // Aggregate total stats
-  const [totalAgg, memoryCount, cronJobCount, recentMessages] = await Promise.all([
+  // Aggregate total & today stats
+  const [totalAgg, todayAgg, memoryCount, cronJobCount, recentMessages] = await Promise.all([
     db.message.aggregate({
       where: { instanceId: instance.id, role: "assistant" },
+      _sum: { inputTokens: true, outputTokens: true },
+      _count: { id: true },
+    }),
+    db.message.aggregate({
+      where: {
+        instanceId: instance.id,
+        role: "assistant",
+        createdAt: { gte: todayStart },
+      },
       _sum: { inputTokens: true, outputTokens: true },
       _count: { id: true },
     }),
@@ -72,6 +84,9 @@ export const getStats = protectedProcedure.query(async ({ ctx }) => {
     totalMessages: totalAgg._count.id,
     totalInputTokens: totalAgg._sum.inputTokens ?? 0,
     totalOutputTokens: totalAgg._sum.outputTokens ?? 0,
+    todayMessages: todayAgg._count.id,
+    todayInputTokens: todayAgg._sum.inputTokens ?? 0,
+    todayOutputTokens: todayAgg._sum.outputTokens ?? 0,
     dailyMessages,
     memoryCount,
     cronJobCount,

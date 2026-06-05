@@ -398,9 +398,7 @@ export default function IdeasPage() {
   const router = useRouter();
 
   const handleCopyAndGo = async (prompt: string) => {
-    await navigator.clipboard.writeText(prompt);
-    showSuccessToast("Prompt copied to clipboard! Paste it to activate.");
-    router.push("/dashboard");
+    router.push(`/dashboard?prompt=${encodeURIComponent(prompt)}`);
   };
 
   return (

@@ -3,6 +3,9 @@ import { ErrorBoundary } from "~/components/core/error-boundary";
 import { TrustClawChat } from "./_components/chat/trustclaw-chat";
 import { OnboardingClient } from "./_components/onboarding/onboarding-client";
 
+import { Suspense } from "react";
+import { TrustClawChatSkeleton } from "./_components/chat/trustclaw-chat.skeleton";
+
 export default async function Page() {
   void trpcServer.api.trustclaw.getHistory.prefetchInfinite({ limit: 10 });
   void trpcServer.api.trustclaw.getStreamingMessage.prefetch();
@@ -27,7 +30,9 @@ export default async function Page() {
   return (
     <HydrateClient>
       <ErrorBoundary>
-        <TrustClawChat />
+        <Suspense fallback={<TrustClawChatSkeleton />}>
+          <TrustClawChat />
+        </Suspense>
       </ErrorBoundary>
     </HydrateClient>
   );

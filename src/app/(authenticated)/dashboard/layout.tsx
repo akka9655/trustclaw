@@ -13,7 +13,7 @@ export default function DashboardLayout({
         <ErrorBoundary>
           <DashboardNavbar />
         </ErrorBoundary>
-        <main className="min-h-0 flex-1">{children}</main>
+        <main className="min-h-0 flex-1 pb-16 md:pb-0">{children}</main>
       </div>
     </TooltipProvider>
   );
