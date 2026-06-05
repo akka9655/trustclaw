@@ -5,6 +5,7 @@ import { useChat } from "@ai-sdk/react";
 import type { UIMessage } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { trpc } from "~/clients/trpc";
+import { toast } from "sonner";
 
 export function useChatHook({ initialMessages, streamId }: {
   initialMessages: UIMessage[];
@@ -30,8 +31,24 @@ export function useChatHook({ initialMessages, streamId }: {
     onFinish: () => {
       void utils.trustclaw.getHistory.invalidate();
     },
-    onError: () => {
+    onError: (error) => {
       void utils.trustclaw.getHistory.invalidate();
+
+      // Try to parse the error body for a user-friendly message
+      let message = "Something went wrong. Please try again.";
+      const rawMessage = error instanceof Error ? error.message : String(error);
+
+      if (rawMessage.includes("quota") || rawMessage.includes("rate_limit") || rawMessage.includes("429")) {
+        message = "⚠️ AI quota exceeded — switch to a GitHub Model in Settings, or wait and retry.";
+      } else if (rawMessage.includes("GITHUB_MODELS_API_KEY") || rawMessage.includes("API key is missing")) {
+        message = "⚠️ GitHub Models API key is not configured. Go to Settings → Model to set it up.";
+      } else if (rawMessage.includes("401") || rawMessage.includes("Unauthorized")) {
+        message = "⚠️ Session expired. Please refresh the page.";
+      } else if (rawMessage.trim()) {
+        message = rawMessage;
+      }
+
+      toast.error(message, { duration: 8000 });
     },
   });
 

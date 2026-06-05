@@ -5,6 +5,19 @@ const config = {
 
   async headers() {
     return [
+      // ── Next.js static chunks (JS, CSS, fonts) — immutable, 1-year CDN cache ──
+      // This is the primary fix for Vercel Fast Origin Transfer overages.
+      // Hashed filenames guarantee correctness; browsers/CDN never re-fetch.
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // ── Public images, fonts, and other static assets ──────────────────────────
       {
         source: "/images/:path*",
         headers: [
@@ -14,6 +27,29 @@ const config = {
           },
         ],
       },
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // ── Favicon & manifest — cache for 24 hours ────────────────────────────────
+      {
+        source: "/favicon.ico",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400" },
+        ],
+      },
+      {
+        source: "/manifest.json",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400" },
+        ],
+      },
+      // ── Security + general headers for all routes ──────────────────────────────
       {
         source: "/:path*",
         headers: [

@@ -185,6 +185,29 @@ export async function prepareAgentRun(
     },
   });
 
+  // Map of TrustClaw schema keys → actual GitHub Models API model IDs
+  const GITHUB_MODEL_ID_MAP: Record<string, string> = {
+    // OpenAI GPT family
+    "github-gpt-4.1-nano":           "gpt-4.1-nano",
+    "github-gpt-4.1-mini":           "gpt-4.1-mini",
+    "github-gpt-4o-mini":            "gpt-4o-mini",
+    "github-gpt-4o":                 "gpt-4o",
+    "github-o4-mini":                "o4-mini",
+    // Meta Llama
+    "github-llama-3.1-8b-instruct":  "meta/Llama-3.1-8B-Instruct",
+    "github-llama-3.3-70b-instruct": "meta/Llama-3.3-70B-Instruct",
+    // Microsoft Phi
+    "github-phi-4-mini-instruct":    "microsoft/Phi-4-mini-instruct",
+    "github-phi-4":                  "microsoft/Phi-4",
+    // DeepSeek
+    "github-deepseek-v3":            "deepseek/DeepSeek-V3-0324",
+    "github-deepseek-r1":            "deepseek/DeepSeek-R1-0528",
+    // Mistral
+    "github-mistral-small":          "mistral-ai/Mistral-Small",
+    // xAI Grok
+    "github-grok-3-mini":            "xai/Grok-3-Mini",
+  };
+
   // Resolve model based on custom API, selected built-in GitHub model, or default to Gemini
   let agentModel: any = geminiModel;
 
@@ -198,7 +221,7 @@ export async function prepareAgentRun(
     const githubModelsApiKey = process.env.GITHUB_MODELS_API_KEY ?? process.env.GITHUB_TOKEN;
     if (!githubModelsApiKey) {
       throw new Error(
-        "GitHub Models API key is missing. Add GITHUB_MODELS_API_KEY to Vercel environment variables (GitHub PAT with models:read scope)."
+        "GitHub Models API key is missing. Please add GITHUB_MODELS_API_KEY to your .env or Vercel environment variables.",
       );
     }
     const githubOpenai = createOpenAI({
@@ -206,27 +229,15 @@ export async function prepareAgentRun(
       apiKey: githubModelsApiKey,
     });
 
-    // Map our schema key → actual GitHub Models API model ID
-    const GITHUB_MODEL_MAP: Record<string, string> = {
-      "github-gpt-4.1-nano":           "openai/gpt-4.1-nano",
-      "github-gpt-4.1-mini":           "openai/gpt-4.1-mini",
-      "github-gpt-4o-mini":            "openai/gpt-4o-mini",
-      "github-gpt-4o":                 "openai/gpt-4o",
-      "github-o4-mini":                "openai/o4-mini",
-      "github-llama-3.1-8b-instruct":  "meta/meta-llama-3.1-8b-instruct",
-      "github-llama-3.3-70b-instruct": "meta/llama-3.3-70b-instruct",
-      "github-phi-4-mini-instruct":    "microsoft/phi-4-mini-instruct",
-      "github-phi-4":                  "microsoft/phi-4",
-      "github-deepseek-v3":            "deepseek/DeepSeek-V3-0324",
-      "github-deepseek-r1":            "deepseek/DeepSeek-R1",
-      "github-mistral-small":          "mistral-ai/mistral-small-3.1-24b-instruct-2503",
-      "github-grok-3-mini":            "xai/grok-3-mini",
-    };
+    const resolvedModelId =
+      GITHUB_MODEL_ID_MAP[instance.anthropicModel] ?? "gpt-4o-mini";
 
-    const resolvedModelId = GITHUB_MODEL_MAP[instance.anthropicModel] ?? "openai/gpt-4o-mini";
+    console.log(
+      `[agent/setup] GitHub Models: using ${instance.anthropicModel} → ${resolvedModelId}`,
+    );
+
     agentModel = githubOpenai(resolvedModelId);
   }
-
 
   const agent = new ToolLoopAgent({
     model: agentModel,
