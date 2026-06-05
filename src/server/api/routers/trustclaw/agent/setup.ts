@@ -185,27 +185,28 @@ export async function prepareAgentRun(
     },
   });
 
-  // Map of TrustClaw schema keys → actual GitHub Models API model IDs
+  // Map of TrustClaw schema keys → actual GitHub Models catalog IDs
+  // Source: https://models.inference.ai.azure.com (correct OpenAI-compatible endpoint)
   const GITHUB_MODEL_ID_MAP: Record<string, string> = {
-    // OpenAI GPT family
+    // OpenAI GPT family (no prefix — served directly by the endpoint)
     "github-gpt-4.1-nano":           "gpt-4.1-nano",
     "github-gpt-4.1-mini":           "gpt-4.1-mini",
     "github-gpt-4o-mini":            "gpt-4o-mini",
     "github-gpt-4o":                 "gpt-4o",
     "github-o4-mini":                "o4-mini",
-    // Meta Llama
-    "github-llama-3.1-8b-instruct":  "meta/Llama-3.1-8B-Instruct",
-    "github-llama-3.3-70b-instruct": "meta/Llama-3.3-70B-Instruct",
-    // Microsoft Phi
-    "github-phi-4-mini-instruct":    "microsoft/Phi-4-mini-instruct",
-    "github-phi-4":                  "microsoft/Phi-4",
-    // DeepSeek
-    "github-deepseek-v3":            "deepseek/DeepSeek-V3-0324",
-    "github-deepseek-r1":            "deepseek/DeepSeek-R1-0528",
-    // Mistral
-    "github-mistral-small":          "mistral-ai/Mistral-Small",
-    // xAI Grok
-    "github-grok-3-mini":            "xai/Grok-3-Mini",
+    // Meta Llama (lowercase, as returned by the catalog API)
+    "github-llama-3.1-8b-instruct":  "meta/llama-3.1-8b-instruct",
+    "github-llama-3.3-70b-instruct": "meta/llama-3.3-70b-instruct",
+    // Microsoft Phi (lowercase)
+    "github-phi-4-mini-instruct":    "microsoft/phi-4-mini-instruct",
+    "github-phi-4":                  "microsoft/phi-4",
+    // DeepSeek (lowercase)
+    "github-deepseek-v3":            "deepseek/deepseek-v3",
+    "github-deepseek-r1":            "deepseek/deepseek-r1",
+    // Mistral (lowercase)
+    "github-mistral-small":          "mistral-ai/mistral-small",
+    // xAI Grok (lowercase)
+    "github-grok-3-mini":            "xai/grok-3-mini",
   };
 
   // Resolve model based on custom API, selected built-in GitHub model, or default to Gemini
@@ -224,17 +225,20 @@ export async function prepareAgentRun(
         "GitHub Models API key is missing. Please add GITHUB_MODELS_API_KEY to your .env or Vercel environment variables.",
       );
     }
-    const githubOpenai = createOpenAI({
-      baseURL: "https://models.github.ai/inference",
-      apiKey: githubModelsApiKey,
-    });
 
     const resolvedModelId =
       GITHUB_MODEL_ID_MAP[instance.anthropicModel] ?? "gpt-4o-mini";
 
     console.log(
-      `[agent/setup] GitHub Models: using ${instance.anthropicModel} → ${resolvedModelId}`,
+      `[agent/setup] GitHub Models → endpoint: models.inference.ai.azure.com, model: ${resolvedModelId}`,
     );
+
+    // Correct endpoint: models.inference.ai.azure.com (OpenAI-compatible Azure-hosted endpoint)
+    // NOT models.github.ai/inference — that URL returns 404 for all models
+    const githubOpenai = createOpenAI({
+      baseURL: "https://models.inference.ai.azure.com",
+      apiKey: githubModelsApiKey,
+    });
 
     agentModel = githubOpenai(resolvedModelId);
   }
